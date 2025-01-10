@@ -1,0 +1,65 @@
+services:
+  callx_backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: callx_backend
+    restart: always
+    volumes:
+      - /var/log/callx:/var/log/callx
+    expose:
+      - "8009"
+    ports:
+      - 8009:8000
+    environment:
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+      - BLAND_API_KEY=${BLAND_API_KEY}
+      - GHL_CLIENT_ID=${GHL_CLIENT_ID}
+      - GHL_CLIENT_SECRET=${GHL_CLIENT_SECRET}
+      - PG_LOCAL_DATABASE_URL=${PG_LOCAL_DATABASE_URL}
+      - SERVER_BASE_URL=https://api.callx.ai
+      - ENVIRONMENT=Production
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - AUTH_TOKEN_TEST=${AUTH_TOKEN_TEST}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    entrypoint: ["/app/scripts/start-backend.sh"]
+    depends_on:
+      callx_db:
+        condition: service_healthy
+
+  callx_db:
+    container_name: callx_db
+    image: postgres:16-alpine
+    volumes:
+      - callx_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=callx
+      - POSTGRES_PASSWORD=callx
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U callx" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    container_name: nginx
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - /etc/letsencrypt/live/api.callx.ai/fullchain.pem:/etc/letsencrypt/live/api.callx.ai/fullchain.pem
+      - /etc/letsencrypt/live/api.callx.ai/privkey.pem:/etc/letsencrypt/live/api.callx.ai/privkey.pem
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - callx_backend
+volumes:
+  callx_db: {}

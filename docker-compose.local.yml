@@ -1,0 +1,27 @@
+services:
+  chili_db:
+    container_name: chili_postgresql_db
+    image: postgres:16-alpine
+    volumes:
+      - chili_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=chili
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - "5432"
+    ports:
+      - "5442:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U chili" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # callx_redis:
+  #   image: 'redis:latest'
+  #   container_name: 'callx_redis'
+  #   ports:
+  #     - '6390:6379'
+
+volumes:
+  chili_db: {}

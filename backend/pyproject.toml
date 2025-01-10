@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "chili"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.6"
+python-multipart = "^0.0.20"
+uvicorn = "^0.34.0"
+pydantic-settings = "^2.7.0"
+python-dotenv = "^1.0.1"
+sqlmodel = "^0.0.22"
+boto3=="^1.35.85"
+rich=="^13.9.4"
+psycopg2="^2.9.19"
+python-multipart = "^0.0.17"
+pydantic = {extras = ["email"], version = "^2.7.0"}
+pwdlib=="^0.2.1"
+pwdlib = {extras= ["bcrypt"], version = "^4.2.1"}
+gunicorn = "^23.0.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
